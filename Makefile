@@ -1,10 +1,6 @@
 vendor:
 	go mod tidy && go mod vendor
 
-.PHONY: codegen
-codegen: vendor
-	go generate ./...
-
 .PHONY: vet
 vet:
 	go vet ./...
