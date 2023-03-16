@@ -50,7 +50,7 @@ var defaultBodyLogFormatter = func(param *FormatterParams) string {
 		param.ginParam.ErrorMessage,
 	)
 	if len(param.RequestBody) > 0 {
-		return baseLog + string(param.RequestBody)
+		return baseLog + "\"" + string(param.RequestBody) + "\""
 	}
 	return baseLog
 }
@@ -68,7 +68,7 @@ var beforeRequestFormatter = func(param *FormatterParams) string {
 		param.ginParam.Path,
 	)
 	if len(param.RequestBody) > 0 {
-		return baseLog + string(param.RequestBody)
+		return baseLog + "\"" + string(param.RequestBody) + "\""
 	}
 	return baseLog
 }
