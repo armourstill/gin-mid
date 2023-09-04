@@ -28,6 +28,7 @@ type FormatterParams struct {
 	ginParam *gin.LogFormatterParams
 
 	RequestBody []byte
+	UserAgent   string
 }
 
 var defaultBodyLogFormatter = func(param *FormatterParams) string {
@@ -41,11 +42,12 @@ var defaultBodyLogFormatter = func(param *FormatterParams) string {
 	if param.ginParam.Latency > time.Minute {
 		param.ginParam.Latency = param.ginParam.Latency.Truncate(time.Second)
 	}
-	baseLog := fmt.Sprintf("[GIN] %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+	baseLog := fmt.Sprintf("[GIN] %v |%s %3d %s| %-12v | %-12s | %-.10s |%s %-5s %s %#v\n%s",
 		param.ginParam.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.ginParam.StatusCode, resetColor,
 		param.ginParam.Latency,
 		param.ginParam.ClientIP,
+		param.UserAgent,
 		methodColor, param.ginParam.Method, resetColor, param.ginParam.Path,
 		param.ginParam.ErrorMessage,
 	)
@@ -62,9 +64,11 @@ var beforeRequestFormatter = func(param *FormatterParams) string {
 		resetColor = param.ginParam.ResetColor()
 	}
 
-	baseLog := fmt.Sprintf("[GIN] %v |%s %-7s %s %#v\n",
+	baseLog := fmt.Sprintf("[GIN] %v | %-12s | %-.10s |%s %-5s %s %#v\n",
 		param.ginParam.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		methodColor, param.ginParam.Method, resetColor,
+		param.ginParam.ClientIP,
+		param.UserAgent,
 		param.ginParam.Path,
 	)
 	if len(param.RequestBody) > 0 {
@@ -130,6 +134,7 @@ func WithConfig(conf *Config) gin.HandlerFunc {
 				ClientIP: c.ClientIP(),
 				Method:   c.Request.Method,
 			},
+			UserAgent: c.Request.UserAgent(),
 		}
 		// Start timer
 		start := time.Now()
